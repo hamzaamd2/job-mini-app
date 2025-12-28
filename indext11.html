@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Finder Mini App</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f7f7f7; }
+header { background:#0077ff; color:#fff; padding:15px; text-align:center; font-size:1.5em; }
+.container { padding:15px; }
+.search-bar { width:100%; padding:10px; font-size:1em; margin-bottom:15px; }
+.categories { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
+.category-btn { flex:1; padding:10px; background:#fff; border:1px solid #ccc; border-radius:8px; text-align:center; cursor:pointer; }
+.category-btn.active { background:#0077ff; color:#fff; border-color:#0077ff; }
+.job-card { background:#fff; border-radius:8px; padding:10px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); cursor:pointer; }
+.job-title { font-weight:bold; font-size:1.1em; }
+.job-info { font-size:0.9em; color:#555; margin-bottom:5px; }
+.apply-btn { display:inline-block; padding:8px 12px; background:#28a745; color:#fff; border:none; border-radius:5px; cursor:pointer; text-decoration:none; margin-top:5px; }
+.ad-placeholder { background:#eee; text-align:center; padding:15px; margin:10px 0; border-radius:8px; font-size:0.9em; color:#888; }
+/* Modal */
+.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
+.modal-content { background:#fff; padding:15px; border-radius:8px; width:90%; max-width:400px; max-height:80%; overflow-y:auto; }
+.close-btn { float:right; cursor:pointer; font-weight:bold; color:#333; }
+</style>
+</head>
+<body>
+
+<header>Job Finder Africa</header>
+<div class="container">
+    <input type="text" id="searchInput" class="search-bar" placeholder="Search jobs..." onkeyup="filterJobs()">
+
+    <div class="categories" id="categories">
+        <div class="category-btn active" onclick="filterCategory('All', this)">All</div>
+        <div class="category-btn" onclick="filterCategory('Full Time', this)">Full Time</div>
+        <div class="category-btn" onclick="filterCategory('Part Time', this)">Part Time</div>
+        <div class="category-btn" onclick="filterCategory('Remote', this)">Remote</div>
+        <div class="category-btn" onclick="filterCategory('Internship', this)">Internship</div>
+        <div class="category-btn" onclick="filterCategory('0 Experience', this)">0 Experience</div>
+    </div>
+
+    <div id="jobList"></div>
+</div>
+
+<div class="modal" id="jobModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div id="modalJobTitle" class="job-title"></div>
+        <div id="modalJobInfo" class="job-info"></div>
+        <div id="modalJobDesc"></div>
+        <a href="#" id="modalApplyBtn" class="apply-btn">Apply Now</a>
+    </div>
+</div>
+
+<script>
+const jobs = [
+    { title:"Frontend Developer", location:"Addis Ababa", category:"Full Time", experience:"0", posted:"Today", desc:"Skills: HTML, CSS, JS. Responsibilities: Build interfaces.", link:"#"},
+    { title:"Sales Assistant", location:"Dire Dawa", category:"Part Time", experience:"0", posted:"2 days ago", desc:"Customer service and sales duties.", link:"#"},
+    { title:"Graphic Designer", location:"Oromia", category:"Internship", experience:"0", posted:"Today", desc:"Design digital content.", link:"#"},
+    { title:"Customer Support", location:"Addis Ababa", category:"Remote", experience:"0", posted:"1 day ago", desc:"Handle customer queries.", link:"#"},
+    { title:"Data Entry Clerk", location:"Addis Ababa", category:"Full Time", experience:"0", posted:"Today", desc:"Enter data accurately.", link:"#"}
+];
+
+const jobList = document.getElementById('jobList');
+
+function renderJobs(list) {
+    jobList.innerHTML = '';
+    list.forEach((job, index) => {
+        jobList.innerHTML += `
+        <div class="job-card" onclick="openJobModal(${index})">
+            <div class="job-title">${job.title}</div>
+            <div class="job-info">Location: ${job.location} | Experience: ${job.experience} | Posted: ${job.posted}</div>
+        </div>
+        ${index % 4 === 3 ? '<div class="ad-placeholder">Native Ad Here</div>' : ''}
+        `;
+    });
+}
+
+renderJobs(jobs);
+
+function filterCategory(category, element) {
+    Array.from(document.getElementsByClassName('category-btn')).forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+    let filtered = category === 'All' ? jobs : jobs.filter(job => job.category === category);
+    renderJobs(filtered);
+}
+
+function filterJobs() {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = jobs.filter(job => job.title.toLowerCase().includes(keyword));
+    renderJobs(filtered);
+}
+
+function openJobModal(index) {
+    const job = jobs[index];
+    document.getElementById('modalJobTitle').innerText = job.title;
+    document.getElementById('modalJobInfo').innerText = `Location: ${job.location} | Category: ${job.category} | Experience: ${job.experience} | Posted: ${job.posted}`;
+    document.getElementById('modalJobDesc').innerText = job.desc;
+    document.getElementById('modalApplyBtn').href = job.link;
+    document.getElementById('jobModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('jobModal').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
